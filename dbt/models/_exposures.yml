@@ -1,0 +1,17 @@
+version: 2
+
+exposures:
+  - name: plant_telemetry_dashboard
+    label: Plant telemetry dashboard
+    type: dashboard
+    maturity: high
+    url: https://jimmytrmt.github.io/plant-telemetry-analytics/
+    description: Evidence dashboard rebuilt after every pipeline run.
+    owner:
+      name: Jimmy Tremouillault
+    depends_on:
+      - ref('fct_site_daily_kpis')
+      - ref('fct_tag_daily_stats')
+      - ref('fct_downtime_events')
+      - ref('fct_sensor_flatlines')
+      - ref('dim_sites')

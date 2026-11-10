@@ -1,0 +1,80 @@
+version: 2
+
+models:
+  - name: dim_sites
+    description: One row per plant.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: site_id
+        data_type: varchar
+        data_tests: [unique, not_null]
+      - name: site_name
+        data_type: varchar
+      - name: country
+        data_type: varchar
+      - name: timezone
+        data_type: varchar
+        description: IANA timezone used to build local dates.
+      - name: nominal_power_mw
+        data_type: double
+      - name: commissioned_year
+        data_type: integer
+
+  - name: dim_tags
+    description: One row per sensor tag, that is every combination of site and catalog tag.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: tag_id
+        data_type: varchar
+        data_tests: [unique, not_null]
+      - name: site_id
+        data_type: varchar
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_sites')
+                field: site_id
+      - name: tag_name
+        data_type: varchar
+      - name: description
+        data_type: varchar
+      - name: unit
+        data_type: varchar
+      - name: measurement_category
+        data_type: varchar
+      - name: sampling_seconds
+        data_type: integer
+      - name: min_valid
+        data_type: double
+      - name: max_valid
+        data_type: double
+      - name: alarm_high
+        data_type: double
+        description: Upper alarm threshold, null when the tag has none.
+
+  - name: fct_readings_hourly
+    description: >
+      Hourly statistics per tag. Incremental with a lookback window so that late
+      arriving files correct hours that were already processed.
+    columns:
+      - name: tag_hour_id
+        data_tests: [unique, not_null]
+      - name: tag_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_tags')
+                field: tag_id
+      - name: local_date
+        description: '{{ doc("local_date") }}'
+        data_tests: [not_null]
+      - name: completeness_ratio
+        data_tests:
+          - between_values:
+              arguments:
+                min_value: 0
+                max_value: 1

@@ -1,0 +1,67 @@
+{% extends "base.html.j2" %}
+{% block content %}
+<section class="page-head">
+  <h1>About this dashboard</h1>
+  <p class="summary">A portfolio project: industrial sensor data goes in, tested tables come out, and this site is rebuilt every morning.</p>
+</section>
+
+<section class="panel prose">
+  <h2>What you are looking at</h2>
+  <p>Four fictional waste-to-energy plants (France, Germany, United Kingdom, Thailand) each report eight measurements: steam, temperatures, turbine power, waste feed, feedwater, and two stack emissions. All values are simulated, none come from a real site. The simulator adds the problems real telemetry has: lost samples, communication outages, bad quality flags, placeholder values such as -9999, spikes, duplicated rows and frozen sensors.</p>
+  <p><strong>Overview</strong> covers production and how well the fleet ran. <strong>Operations</strong> covers when and for how long each plant stopped. <strong>Data quality</strong> shows whether the numbers can be trusted.</p>
+</section>
+
+<section class="panel">
+  <h2>How the data gets here</h2>
+  <ol class="flow">
+    <li><strong>Simulate</strong><span>Python writes one file of readings per day, like a historian export.</span></li>
+    <li><strong>Load</strong><span>Files go into DuckDB. Reloading the same file changes nothing.</span></li>
+    <li><strong>Model</strong><span>dbt removes duplicates, validates each reading, then builds hourly and daily tables.</span></li>
+    <li><strong>Test</strong><span>More than sixty checks run on every build. A failure stops the publication.</span></li>
+    <li><strong>Publish</strong><span>This site is generated from the final tables and deployed to GitHub Pages.</span></li>
+  </ol>
+  <p class="note">
+    {% if has_docs %}
+    The dbt documentation shows every table, column and test, plus the lineage graph: <a href="dbt-docs/index.html">open the dbt docs</a>.
+    {% else %}
+    The dbt documentation is not part of this build. Run <code>telemetry transform --docs</code> and <code>telemetry dashboard</code> to include it.
+    {% endif %}
+    {% if repository_url %}
+    The code is on <a href="{{ repository_url }}">GitHub</a>.
+    {% endif %}
+  </p>
+</section>
+
+<section class="panel">
+  <h2>Definitions</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Figure</th><th>Definition</th><th>Built in</th></tr></thead>
+      <tbody>
+        <tr><td>Energy delivered</td><td>Sum of the hourly mean turbine power. One hour at 1 MW is 1 MWh.</td><td><code>fct_site_daily_kpis</code></td></tr>
+        <tr><td>Availability</td><td>Running hours divided by running plus stopped hours. Hours without data are left out.</td><td><code>fct_site_daily_kpis</code></td></tr>
+        <tr><td>Capacity factor</td><td>Energy delivered divided by nominal power times running plus stopped hours.</td><td><code>fct_site_daily_kpis</code></td></tr>
+        <tr><td>Emission alarms</td><td>Hours where the hourly mean of NOx (limit 200 mg/Nm3) or CO (limit 50 mg/Nm3) was above its limit.</td><td><code>fct_tag_daily_stats</code></td></tr>
+        <tr><td>Data completeness</td><td>Valid samples divided by expected samples, averaged over the eight measurements.</td><td><code>fct_tag_daily_stats</code></td></tr>
+        <tr><td>Stop</td><td>A run of consecutive stopped hours, found with a gaps and islands query.</td><td><code>fct_downtime_events</code></td></tr>
+        <tr><td>Stuck sensor</td><td>At least 4 hours in a row with no variation at all in a tag.</td><td><code>fct_sensor_flatlines</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel prose">
+  <h2>Using the controls</h2>
+  <ul>
+    <li><strong>Period</strong> and <strong>plants</strong> at the top of each page filter every figure, chart and table on it. Your choice is kept while you move between pages.</li>
+    <li><strong>Reset</strong> returns to the full period and all plants.</li>
+    <li>The moon and sun button switches between the light and dark theme. The first visit follows your system setting.</li>
+    <li>Tables can be downloaded as CSV with the buttons above them. Scorecard columns sort on click.</li>
+  </ul>
+  <h2>Good to know</h2>
+  <ul>
+    <li>Days are local to each plant. The first and last days of the data are partial and are left out of the figures.</li>
+    <li>The simulator is plausible, not calibrated against real plants.</li>
+  </ul>
+</section>
+{% endblock %}

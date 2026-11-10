@@ -1,0 +1,41 @@
+name: plant_telemetry
+version: "1.0.0"
+config-version: 2
+profile: plant_telemetry
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # Tags that drive the site level KPIs. Change the name here, nowhere else.
+  power_tag_name: TURBINE_POWER
+  feed_tag_name: WASTE_FEED_RATE
+  # Raw values that mean "no measurement" regardless of the quality flag.
+  sentinel_values: [-9999, 32767]
+  # A site counts as running when mean hourly power exceeds this share of nominal power.
+  running_threshold_ratio: 0.05
+  downtime_short_trip_max_hours: 6
+  downtime_maintenance_min_hours: 24
+  flatline_min_hours: 4
+  flatline_stddev_epsilon: 0.0000001
+  # Late-arriving data is reprocessed over this many days by incremental models.
+  incremental_lookback_days: 3
+
+models:
+  plant_telemetry:
+    staging:
+      +materialized: view
+      +schema: staging
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+    marts:
+      +materialized: table
+      +schema: marts
+
+seeds:
+  plant_telemetry:
+    +schema: reference

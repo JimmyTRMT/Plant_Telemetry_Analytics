@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>{{ page.title }} | Plant telemetry</title>
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("telemetry-theme");
+        var dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.dataset.theme = saved || (dark ? "dark" : "light");
+      } catch (error) { /* keep the light default */ }
+    })();
+  </script>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235b46d6'/%3E%3Cpath d='M4 17h6l3-8 5 14 3-6h7' fill='none' stroke='white' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="{{ page.key }}">
+  <a class="skip" href="#content">Skip to content</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="index.html">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect width="32" height="32" rx="8"></rect>
+          <path d="M4 17h6l3-8 5 14 3-6h7"></path>
+        </svg>
+        <span>Plant telemetry</span>
+      </a>
+      <nav class="tabs" aria-label="Pages">
+        {% for item in pages %}
+        <a href="{{ item.filename }}"{% if item.key == page.key %} aria-current="page"{% endif %}>{{ item.label }}</a>
+        {% endfor %}
+      </nav>
+      <div class="tools">
+        {% if has_docs %}
+        <a class="btn" href="dbt-docs/index.html">dbt docs</a>
+        {% endif %}
+        {% if repository_url %}
+        <a class="btn" href="{{ repository_url }}">Source code</a>
+        {% endif %}
+        <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch to dark theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  {% if page.has_filters %}
+  <div class="filters" role="region" aria-label="Filters">
+    <div class="filters-inner">
+      <div class="seg" id="period" role="radiogroup" aria-label="Period"></div>
+      <div class="chips" id="site-chips" role="group" aria-label="Plants"></div>
+      <button class="btn ghost" id="reset-filters" type="button">Reset</button>
+    </div>
+  </div>
+  {% endif %}
+
+  <main class="page" id="content">
+    <noscript><p class="notice">The charts on this site are drawn with JavaScript. Enable it to see them.</p></noscript>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <p>
+      Synthetic data from 4 fictional plants, {{ data.first_day }} to {{ data.last_day }}.
+      Refreshed {{ data.generated_at.strftime("%d %b %Y, %H:%M") }} UTC.
+    </p>
+  </footer>
+
+  {% if page.has_filters %}
+  <script type="application/json" id="dashboard-data">{{ payload | safe }}</script>
+  <script src="assets/plotly.min.js" charset="utf-8"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/charts.js"></script>
+  <script src="assets/pages.js"></script>
+  {% else %}
+  <script src="assets/app.js"></script>
+  {% endif %}
+</body>
+</html>

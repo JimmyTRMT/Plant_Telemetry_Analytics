@@ -1,0 +1,6 @@
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        # Official GitHub actions are pinned to a major tag and kept current by Dependabot.
+        actions/*: ref-pin

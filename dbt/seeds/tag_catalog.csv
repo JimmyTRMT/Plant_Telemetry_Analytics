@@ -1,0 +1,9 @@
+tag_name,description,unit,measurement_category,sampling_seconds,min_valid,max_valid,alarm_high
+STEAM_PRESSURE,Main steam header pressure,bar,pressure,300,0,90,
+STEAM_TEMPERATURE,Main steam temperature,degC,temperature,300,0,560,
+FLUE_GAS_TEMPERATURE,Furnace outlet flue gas temperature,degC,temperature,300,0,1300,
+TURBINE_POWER,Turbine generator active power,MW,power,300,0,60,
+WASTE_FEED_RATE,Waste feed to the furnace,t/h,flow,300,0,80,
+FEEDWATER_FLOW,Boiler feedwater flow,t/h,flow,600,0,220,
+STACK_NOX,Stack NOx concentration,mg/Nm3,emission,60,0,500,200
+STACK_CO,Stack CO concentration,mg/Nm3,emission,60,0,200,50

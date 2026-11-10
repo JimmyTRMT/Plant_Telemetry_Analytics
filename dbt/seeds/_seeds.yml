@@ -1,0 +1,39 @@
+version: 2
+
+seeds:
+  - name: sites
+    description: Plant register. The simulator reads the same file.
+    config:
+      column_types:
+        nominal_power_mw: double
+        commissioned_year: integer
+    columns:
+      - name: site_id
+        data_tests:
+          - unique
+          - not_null
+      - name: timezone
+        data_tests:
+          - not_null
+
+  - name: tag_catalog
+    description: Generic tag definitions. Every site exposes every tag listed here.
+    config:
+      column_types:
+        sampling_seconds: integer
+        min_valid: double
+        max_valid: double
+        alarm_high: double
+    columns:
+      - name: tag_name
+        data_tests:
+          - unique
+          - not_null
+      - name: measurement_category
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [pressure, temperature, power, flow, emission]
+      - name: sampling_seconds
+        data_tests:
+          - not_null

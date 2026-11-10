@@ -1,0 +1,58 @@
+{% extends "base.html.j2" %}
+{% block content %}
+<section class="page-head">
+  <h1>Data quality</h1>
+  <p class="summary" id="summary" aria-live="polite"></p>
+  <details class="help">
+    <summary>How to read this page</summary>
+    <div class="help-body">
+      <p>Sensors send readings every minute or every few minutes. Before any figure on the other pages is computed, each reading is checked. Nothing is deleted: a rejected reading stays in the warehouse with its reason, which is how this page can count it.</p>
+      <dl>
+        <dt>Arrived</dt>
+        <dd>Valid samples received divided by samples expected for the hours observed.</dd>
+        <dt>Rejected</dt>
+        <dd>A received sample is rejected when its value is missing, its device flag is BAD, it equals a placeholder such as -9999, or it falls outside the physical range of the tag.</dd>
+        <dt>Stuck sensor</dt>
+        <dd>A tag that reports exactly the same value for 4 hours or more. Each reading looks valid, but the sensor has probably frozen.</dd>
+      </dl>
+    </div>
+  </details>
+</section>
+
+<section class="panel">
+  <header class="panel-head">
+    <div>
+      <h2>Completeness by measurement</h2>
+      <p class="hint" id="insight-completeness">Percentage of expected samples that were received and valid, per measurement and plant.</p>
+    </div>
+  </header>
+  <div class="chart tall" id="chart-completeness" role="img" aria-label="Heatmap of data completeness by tag and plant"></div>
+</section>
+
+<section class="panel">
+  <header class="panel-head">
+    <div>
+      <h2>Rejected samples by measurement</h2>
+      <p class="hint" id="insight-rejected">Share of received samples that failed validation, per measurement.</p>
+    </div>
+  </header>
+  <div class="chart tall" id="chart-rejected" role="img" aria-label="Bar chart of rejected sample share by tag"></div>
+</section>
+
+<section class="panel">
+  <header class="panel-head">
+    <div>
+      <h2>Sensors that stopped changing</h2>
+      <p class="hint" id="flatlines-hint">Tags that repeated the same value for 4 hours or more.</p>
+    </div>
+  </header>
+  <div class="table-wrap">
+    <table id="flatlines">
+      <thead>
+        <tr><th>Plant</th><th>Measurement</th><th>Started (UTC)</th><th class="num">Hours</th><th class="num">Stuck value</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,21 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Landing zone filled by the ingestion step.
+    schema: raw
+    tables:
+      - name: readings
+        description: One row per reading as exported by the historian, duplicates included.
+        columns:
+          - name: site_id
+            data_tests: [not_null]
+          - name: tag_name
+            data_tests: [not_null]
+          - name: ts_utc
+            data_tests: [not_null]
+          - name: quality
+            data_tests:
+              - accepted_values:
+                  arguments:
+                    values: ['GOOD', 'UNCERTAIN', 'BAD']

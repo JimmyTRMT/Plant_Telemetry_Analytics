@@ -1,0 +1,7 @@
+plant_telemetry:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('DUCKDB_PATH', 'warehouse/telemetry.duckdb') }}"
+      threads: 4

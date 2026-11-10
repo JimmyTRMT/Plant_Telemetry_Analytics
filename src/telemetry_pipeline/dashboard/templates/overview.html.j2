@@ -1,0 +1,86 @@
+{% extends "base.html.j2" %}
+{% block content %}
+<section class="page-head">
+  <h1>Fleet performance</h1>
+  <p class="summary" id="summary" aria-live="polite"></p>
+  <details class="help">
+    <summary>How to read this page</summary>
+    <div class="help-body">
+      <p>Every number and chart reacts to the period and plants selected above. Only complete local days are counted, so a plant never looks worse because a day is half recorded.</p>
+      <dl>
+        <dt>Energy delivered</dt>
+        <dd>Electricity produced by the turbine, added up over the period.</dd>
+        <dt>Availability</dt>
+        <dd>Hours the plant was running divided by the hours it was observed. An hour counts as running when the turbine averages at least 5 % of its nominal power.</dd>
+        <dt>Capacity factor</dt>
+        <dd>Energy delivered divided by what the plant would have produced at nominal power during the same hours. It stays below availability because plants rarely run flat out.</dd>
+        <dt>Emission alarms</dt>
+        <dd>Hours when the hourly average of stack NOx or CO went above its alarm limit. An hour counts once per pollutant.</dd>
+        <dt>Data completeness</dt>
+        <dd>Valid samples received divided by the samples expected. Lost, flagged or out-of-range samples lower it.</dd>
+      </dl>
+    </div>
+  </details>
+</section>
+
+<section class="kpis" aria-label="Key figures">
+  <article class="kpi" data-kpi="energy">
+    <svg class="kpi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6z"></path></svg>
+    <h2>Energy delivered</h2>
+    <p class="kpi-value"><span data-value>-</span> <span class="unit">GWh</span></p>
+    <p class="kpi-note">Electricity sent out by the turbines.</p>
+  </article>
+  <article class="kpi" data-kpi="availability">
+    <svg class="kpi-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m8 12.5 3 3 5-6"></path></svg>
+    <h2>Availability</h2>
+    <p class="kpi-value"><span data-value>-</span> <span class="unit">%</span></p>
+    <p class="kpi-note">Share of hours the plants were running.</p>
+  </article>
+  <article class="kpi" data-kpi="capacity">
+    <svg class="kpi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18a8 8 0 1 1 16 0"></path><path d="m12 18 4-6"></path></svg>
+    <h2>Capacity factor</h2>
+    <p class="kpi-value"><span data-value>-</span> <span class="unit">%</span></p>
+    <p class="kpi-note">Output compared with running at nominal power.</p>
+  </article>
+  <article class="kpi" data-kpi="alarms">
+    <svg class="kpi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z"></path><path d="M12 10v5M12 18v.5"></path></svg>
+    <h2>Emission alarms</h2>
+    <p class="kpi-value"><span data-value>-</span> <span class="unit">h</span></p>
+    <p class="kpi-note">Hours above a NOx or CO limit.</p>
+  </article>
+  <article class="kpi" data-kpi="completeness">
+    <svg class="kpi-icon" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"></ellipse><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"></path></svg>
+    <h2>Data completeness</h2>
+    <p class="kpi-value"><span data-value>-</span> <span class="unit">%</span></p>
+    <p class="kpi-note">Valid samples received out of those expected.</p>
+  </article>
+</section>
+
+<section class="panel">
+  <header class="panel-head">
+    <div>
+      <h2>Energy delivered per day</h2>
+      <p class="hint" id="insight-energy">One line per plant, in MWh. Hover a day to compare plants.</p>
+    </div>
+  </header>
+  <div class="chart" id="chart-energy" role="img" aria-label="Line chart of daily energy delivered by plant"></div>
+</section>
+
+<section class="panel">
+  <header class="panel-head">
+    <div>
+      <h2>Plant scorecard</h2>
+      <p class="hint">One row per plant for the selected period. Click a column title to sort.</p>
+    </div>
+    <div class="panel-tools">
+      <button class="btn" id="export-daily" type="button">Download daily data (CSV)</button>
+    </div>
+  </header>
+  <div class="table-wrap">
+    <table id="scorecard">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

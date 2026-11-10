@@ -1,0 +1,122 @@
+version: 2
+
+models:
+  - name: fct_tag_daily_stats
+    description: Daily statistics, completeness and alarm exceedances per tag and local date.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [tag_id, local_date]
+    columns:
+      - name: tag_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_tags')
+                field: tag_id
+      - name: completeness_ratio
+        description: Valid samples divided by the samples expected for the observed hours.
+        data_tests:
+          - between_values:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+  - name: fct_site_daily_kpis
+    description: >
+      Operating KPIs per site and local day. Filter on is_complete_day for reporting,
+      the first and last days of the observed period are partial.
+    config:
+      contract:
+        enforced: true
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [site_id, local_date]
+    columns:
+      - name: site_id
+        data_type: varchar
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_sites')
+                field: site_id
+      - name: local_date
+        data_type: date
+        description: '{{ doc("local_date") }}'
+        data_tests: [not_null]
+      - name: observed_hours
+        data_type: integer
+      - name: running_hours
+        data_type: integer
+      - name: stopped_hours
+        data_type: integer
+      - name: no_data_hours
+        data_type: integer
+      - name: is_complete_day
+        data_type: boolean
+      - name: energy_mwh
+        data_type: double
+        description: Electrical energy from the hourly mean of the power tag. Hours without data count as zero.
+        data_tests:
+          - between_values:
+              arguments:
+                min_value: 0
+                max_value: 2000
+      - name: capacity_factor
+        data_type: double
+        description: Energy divided by what nominal power would deliver over the hours with data.
+        data_tests:
+          - between_values:
+              arguments:
+                min_value: 0
+                max_value: 1.2
+      - name: availability_ratio
+        data_type: double
+        description: Running hours divided by running plus stopped hours, hours without data excluded.
+        data_tests:
+          - between_values:
+              arguments:
+                min_value: 0
+                max_value: 1
+      - name: avg_waste_feed_tph
+        data_type: double
+      - name: emission_exceedance_hours
+        data_type: integer
+        description: Hours where any emission tag peaked above its alarm threshold.
+      - name: data_completeness_ratio
+        data_type: double
+        data_tests:
+          - between_values:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+  - name: fct_downtime_events
+    description: One row per continuous stop of a site, built with a gaps and islands query.
+    columns:
+      - name: downtime_event_id
+        data_tests: [unique, not_null]
+      - name: event_category
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [short_trip, extended_stop, long_shutdown]
+      - name: duration_hours
+        data_tests:
+          - between_values:
+              arguments:
+                min_value: 1
+                max_value: 100000
+
+  - name: fct_sensor_flatlines
+    description: Periods during which a tag stayed perfectly constant while its site was running.
+    columns:
+      - name: flatline_id
+        data_tests: [unique, not_null]
+      - name: tag_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_tags')
+                field: tag_id

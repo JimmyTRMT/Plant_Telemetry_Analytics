@@ -1,0 +1,39 @@
+version: 2
+
+unit_tests:
+  - name: deduplication_prefers_best_quality_then_latest_load
+    model: int_readings_deduplicated
+    given:
+      - input: ref('stg_readings')
+        rows:
+          - {tag_id: S1.T, reading_ts: '2026-01-01 00:00:00', quality_code: UNCERTAIN, ingested_at: '2026-01-02 00:00:00', reading_value: 5}
+          - {tag_id: S1.T, reading_ts: '2026-01-01 00:00:00', quality_code: GOOD, ingested_at: '2026-01-01 12:00:00', reading_value: 6}
+          - {tag_id: S1.T, reading_ts: '2026-01-01 00:05:00', quality_code: GOOD, ingested_at: '2026-01-01 12:00:00', reading_value: 7}
+          - {tag_id: S1.T, reading_ts: '2026-01-01 00:05:00', quality_code: GOOD, ingested_at: '2026-01-03 12:00:00', reading_value: 8}
+    expect:
+      rows:
+        - {tag_id: S1.T, reading_ts: '2026-01-01 00:00:00', quality_code: GOOD, reading_value: 6}
+        - {tag_id: S1.T, reading_ts: '2026-01-01 00:05:00', quality_code: GOOD, reading_value: 8}
+
+  - name: validation_rules_are_applied_in_order
+    model: int_readings_validated
+    given:
+      - input: ref('int_readings_deduplicated')
+        rows:
+          - {tag_id: S1.P, site_id: S1, tag_name: P, reading_ts: '2026-01-01 00:00:00', reading_value: 60, quality_code: GOOD}
+          - {tag_id: S1.P, site_id: S1, tag_name: P, reading_ts: '2026-01-01 00:05:00', reading_value: 61, quality_code: UNCERTAIN}
+          - {tag_id: S1.P, site_id: S1, tag_name: P, reading_ts: '2026-01-01 00:10:00', reading_value: 62, quality_code: BAD}
+          - {tag_id: S1.P, site_id: S1, tag_name: P, reading_ts: '2026-01-01 00:15:00', reading_value: -9999, quality_code: GOOD}
+          - {tag_id: S1.P, site_id: S1, tag_name: P, reading_ts: '2026-01-01 00:20:00', reading_value: 150, quality_code: GOOD}
+          - {tag_id: S1.P, site_id: S1, tag_name: P, reading_ts: '2026-01-01 00:25:00', reading_value: -9999, quality_code: BAD}
+      - input: ref('stg_tags')
+        rows:
+          - {tag_name: P, min_valid: 0, max_valid: 90}
+    expect:
+      rows:
+        - {reading_ts: '2026-01-01 00:00:00', validation_status: valid, is_valid: true}
+        - {reading_ts: '2026-01-01 00:05:00', validation_status: valid, is_valid: true}
+        - {reading_ts: '2026-01-01 00:10:00', validation_status: bad_quality, is_valid: false}
+        - {reading_ts: '2026-01-01 00:15:00', validation_status: sentinel_value, is_valid: false}
+        - {reading_ts: '2026-01-01 00:20:00', validation_status: out_of_range, is_valid: false}
+        - {reading_ts: '2026-01-01 00:25:00', validation_status: bad_quality, is_valid: false}

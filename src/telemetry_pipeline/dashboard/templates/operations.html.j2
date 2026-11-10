@@ -1,0 +1,68 @@
+{% extends "base.html.j2" %}
+{% block content %}
+<section class="page-head">
+  <h1>Plant operations</h1>
+  <p class="summary" id="summary" aria-live="polite"></p>
+  <details class="help">
+    <summary>How to read this page</summary>
+    <div class="help-body">
+      <p>A plant is stopped during an hour when its turbine averages less than 5 % of nominal power. Consecutive stopped hours form one stop.</p>
+      <dl>
+        <dt>Short trip</dt>
+        <dd>A stop under 6 hours, usually an automatic safety trip followed by a restart.</dd>
+        <dt>Extended stop</dt>
+        <dd>A stop from 6 to 24 hours, typically a repair or a planned pause.</dd>
+        <dt>Long shutdown</dt>
+        <dd>A stop of 24 hours or more, typically scheduled maintenance.</dd>
+        <dt>Cut by the period</dt>
+        <dd>A stop that touches the edge of the recorded data may be longer than it looks.</dd>
+      </dl>
+    </div>
+  </details>
+</section>
+
+<section class="panel">
+  <header class="panel-head">
+    <div>
+      <h2>Daily availability by plant</h2>
+      <p class="hint" id="insight-heatmap">Each square is one plant on one local day. A darker square means more hours of running.</p>
+    </div>
+  </header>
+  <div class="chart" id="chart-heatmap" role="img" aria-label="Heatmap of daily availability by plant"></div>
+</section>
+
+<section class="panel">
+  <header class="panel-head">
+    <div>
+      <h2>Stop timeline</h2>
+      <p class="hint">Each bar is one stop, placed on a UTC time axis. Hover a bar for its exact duration.</p>
+    </div>
+  </header>
+  <ul class="legend" aria-label="Stop types">
+    <li><svg viewBox="0 0 12 12" aria-hidden="true" style="color: var(--warn)"><circle cx="6" cy="6" r="5"></circle></svg>Short trip, under 6 h</li>
+    <li><svg viewBox="0 0 12 12" aria-hidden="true" style="color: var(--serious)"><path d="M6 .8 11.2 6 6 11.2.8 6z"></path></svg>Extended stop, 6 to 24 h</li>
+    <li><svg viewBox="0 0 12 12" aria-hidden="true" style="color: var(--critical)"><rect x="1" y="1" width="10" height="10" rx="1.5"></rect></svg>Long shutdown, 24 h or more</li>
+  </ul>
+  <div class="chart short" id="chart-timeline" role="img" aria-label="Timeline of plant stops"></div>
+</section>
+
+<section class="panel">
+  <header class="panel-head">
+    <div>
+      <h2>Stop log</h2>
+      <p class="hint" id="stops-hint">Most recent stops first. Times are local to each plant.</p>
+    </div>
+    <div class="panel-tools">
+      <button class="btn" id="export-stops" type="button">Download stops (CSV)</button>
+    </div>
+  </header>
+  <div class="table-wrap">
+    <table id="stops">
+      <thead>
+        <tr><th>Plant</th><th>Started (local time)</th><th class="num">Duration</th><th>Type</th><th>Note</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

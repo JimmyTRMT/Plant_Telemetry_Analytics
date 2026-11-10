@@ -1,0 +1,5 @@
+site_id,site_name,country,timezone,nominal_power_mw,commissioned_year
+SITE_01,Aurora,France,Europe/Paris,24.0,2009
+SITE_02,Borealis,Germany,Europe/Berlin,32.5,2014
+SITE_03,Cascade,United Kingdom,Europe/London,18.0,2011
+SITE_04,Delta,Thailand,Asia/Bangkok,12.0,2019

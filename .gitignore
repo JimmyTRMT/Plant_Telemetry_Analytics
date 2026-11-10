@@ -1,0 +1,33 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+
+# Generated data and warehouse
+data/
+warehouse/
+*.duckdb
+*.duckdb.wal
+
+# dbt
+dbt/target/
+dbt/logs/
+dbt/.user.yml
+dbt/dbt_packages/
+logs/
+
+# Static site output
+site/
+
+# Editors, OS, secrets
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.env

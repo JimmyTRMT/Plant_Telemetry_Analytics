@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: stg_readings
+    description: Typed and renamed raw readings. Duplicates are kept, see int_readings_deduplicated.
+    columns:
+      - name: tag_id
+        description: Site and tag name joined with a dot, for example SITE_01.STEAM_PRESSURE.
+        data_tests: [not_null]
+      - name: tag_name
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_tags')
+                field: tag_name
+      - name: site_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_sites')
+                field: site_id
+      - name: reading_ts
+        description: Sample time in UTC.
+        data_tests: [not_null]
+      - name: quality_code
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['GOOD', 'UNCERTAIN', 'BAD']
+
+  - name: stg_sites
+    description: Plant register.
+    columns:
+      - name: site_id
+        data_tests: [unique, not_null]
+
+  - name: stg_tags
+    description: Tag catalog with validity ranges and alarm thresholds.
+    columns:
+      - name: tag_name
+        data_tests: [unique, not_null]

@@ -1,0 +1,20 @@
+version: 2
+
+unit_tests:
+  - name: downtime_events_group_consecutive_stopped_hours
+    model: fct_downtime_events
+    given:
+      - input: ref('int_site_hourly_status')
+        rows:
+          - {site_id: S1, hour_start: '2026-01-01 00:00:00', local_hour_start: '2026-01-01 01:00:00', hourly_status: running}
+          - {site_id: S1, hour_start: '2026-01-01 01:00:00', local_hour_start: '2026-01-01 02:00:00', hourly_status: stopped}
+          - {site_id: S1, hour_start: '2026-01-01 02:00:00', local_hour_start: '2026-01-01 03:00:00', hourly_status: stopped}
+          - {site_id: S1, hour_start: '2026-01-01 03:00:00', local_hour_start: '2026-01-01 04:00:00', hourly_status: running}
+          - {site_id: S1, hour_start: '2026-01-01 04:00:00', local_hour_start: '2026-01-01 05:00:00', hourly_status: no_data}
+          - {site_id: S1, hour_start: '2026-01-01 05:00:00', local_hour_start: '2026-01-01 06:00:00', hourly_status: stopped}
+          - {site_id: S1, hour_start: '2026-01-01 06:00:00', local_hour_start: '2026-01-01 07:00:00', hourly_status: stopped}
+          - {site_id: S1, hour_start: '2026-01-01 07:00:00', local_hour_start: '2026-01-01 08:00:00', hourly_status: stopped}
+    expect:
+      rows:
+        - {site_id: S1, started_at: '2026-01-01 01:00:00', ended_at: '2026-01-01 03:00:00', duration_hours: 2, event_category: short_trip, is_censored: false}
+        - {site_id: S1, started_at: '2026-01-01 05:00:00', ended_at: '2026-01-01 08:00:00', duration_hours: 3, event_category: short_trip, is_censored: true}

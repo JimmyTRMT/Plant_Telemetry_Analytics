@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: int_readings_deduplicated
+    description: One reading per tag and timestamp.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [tag_id, reading_ts]
+
+  - name: int_readings_validated
+    description: Deduplicated readings with a validation verdict.
+    columns:
+      - name: reading_id
+        data_tests: [unique, not_null]
+      - name: validation_status
+        description: '{{ doc("validation_status") }}'
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [valid, bad_quality, sentinel_value, out_of_range, missing_value]
+
+  - name: int_readings_hourly
+    description: Hourly statistics per tag computed on valid samples only.
+    columns:
+      - name: tag_hour_id
+        data_tests: [unique, not_null]
+      - name: completeness_ratio
+        data_tests:
+          - between_values:
+              arguments:
+                min_value: 0
+                max_value: 1
+
+  - name: int_site_hourly_status
+    description: Operating status of every site for every hour of the observed period.
+    data_tests:
+      - unique_combination:
+          arguments:
+            columns: [site_id, hour_start]
+    columns:
+      - name: hourly_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [running, stopped, no_data]
