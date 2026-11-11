@@ -4,8 +4,8 @@ An analytics engineering project built around a problem I know from my work: sen
 industrial plants. Raw historian-style exports go in, tested and documented tables come out, and
 a static dashboard is published every morning.
 
-- Dashboard: https://jimmytrmt.github.io/plant-telemetry-analytics/
-- dbt documentation and lineage: https://jimmytrmt.github.io/plant-telemetry-analytics/dbt-docs/
+- Dashboard: https://jimmytrmt.github.io/Plant_Telemetry_Analytics/
+- dbt documentation and lineage: https://jimmytrmt.github.io/Plant_Telemetry_Analytics/dbt-docs/
 
 The data is synthetic. Four fictional plants (France, Germany, United Kingdom, Thailand) produce
 eight tags each. The simulator is deterministic and injects the defects that real telemetry has:
